@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Список товарів</h1>
+
+  <form method="GET" class="form-inline mb-4">
+    <input class="form-control mr-sm-2" type="search" placeholder="Пошук" aria-label="Search" name="q" value="{{ search_query }}">
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Пошук</button>
+  </form>
+
+  <form method="GET" class="form-inline mb-4">
+    <select class="form-control mr-sm-2" name="category">
+      <option value="">Всі категорії</option>
+      {% for category in categories %}
+        <option value="{{ category.id }}" {% if category.id == selected_category %}selected{% endif %}>{{ category.name }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Фільтрувати</button>
+  </form>
+
+  {% if products %}
+    <div class="row">
+      {% for product in products %}
+        <div class="col-md-4 mb-4">
+          <div class="card">
+            <img class="card-img-top" src="{{ product.image.url }}" alt="{{ product.name }}">
+            <div class="card-body">
+              <h5 class="card-title">{{ product.name }}</h5>
+              <p class="card-text">{{ product.description }}</p>
+              <p class="card-text"><strong>Ціна: {{ product.price }} грн</strong></p>
+              <a href="{% url 'product_detail' pk=product.pk %}" class="btn btn-primary">Детальніше</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+      <nav aria-label="Навігація по сторінках">
+        <ul class="pagination">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page=1{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" tabindex="-1" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}" tabindex="-1" aria-label="Previous">
+                <span aria-hidden="true">&lt;</span>
+                <span class="sr-only">Назад</span>
+              </a>
+            </li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active">
+                <a class="page-link" href="#">{{ num }} <span class="sr-only">(Поточна)</span></a>
+              </li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %} 
+            {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+        
+    {% else %}
+    <p>На жаль, товарів не знайдено.</p>
+    {% endif %}
+        
+{% endblock %}

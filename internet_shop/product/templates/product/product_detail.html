@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>{{ product.name }}</h1>
+  <p>{{ product.description }}</p>
+  <p>Ціна: {{ product.price }} грн</p>
+
+  <h2>Відгуки</h2>
+  {% if product.comments.all %}
+    <ul>
+      {% for comment in product.comments.all %}
+        <li>
+          <strong>{{ comment.author.username }}</strong>
+          <p>{{ comment.text }}</p>
+          <p>{{ comment.created_date }}</p>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>На жаль, ще немає відгуків для цього товару.</p>
+  {% endif %}
+
+ {% if user.is_authenticated %}
+    <h2>Додати відгук</h2>
+    <form method="POST" class="comment-form">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Додати відгук</button>
+    </form>
+    {% else %}
+        <p>Будь ласка, <a href="{% url 'login' %}">увійдіть</a> або <a href="{% url 'register' %}">зареєструйтеся</a> щоб залишити відгук.</p>
+ {% endif %}
+{% endblock %}
